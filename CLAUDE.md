@@ -19,11 +19,12 @@ A NestJS-based ERP REST API with a Vue 3 frontend dashboard. Starts with a Truck
 
 ### Frontend (Vue 3)
 - **Framework:** Vue 3 + Vite + TypeScript
-- **State:** Pinia
+- **State:** Pinia (minimal, no auth store)
 - **Data fetching:** TanStack Vue Query
-- **HTTP:** Axios with Bearer token interceptor
-- **UI kit:** PrimeVue
+- **HTTP:** Axios — JWT token hardcoded via `VITE_JWT_TOKEN` env var, set in `client/.env`
+- **UI kit:** PrimeVue (Aura theme)
 - **Location:** `client/` directory in monorepo
+- **No router** — single-page dashboard, `App.vue` renders `Dashboard.vue` directly
 
 ### Infrastructure
 - **Local dev:** Docker Compose (all services in one command)
@@ -66,15 +67,17 @@ truck-erp/
 ├── client/                         # Vue 3 dashboard
 │   ├── src/
 │   │   ├── api/
-│   │   │   └── trucks.ts           # Axios calls
-│   │   ├── stores/
-│   │   │   └── auth.ts             # JWT token (localStorage)
+│   │   │   └── trucks.ts           # Axios instance (VITE_JWT_TOKEN from .env)
+│   │   ├── types/
+│   │   │   └── truck.ts            # Truck types, TruckStatus const, VALID_TRANSITIONS
 │   │   ├── components/
-│   │   │   ├── TruckTable.vue
-│   │   │   ├── TruckFormModal.vue
-│   │   │   └── StatusBadge.vue
-│   │   └── views/
-│   │       └── Dashboard.vue
+│   │   │   ├── TruckFormModal.vue  # Create / Edit modal (shared form)
+│   │   │   └── StatusBadge.vue     # Colored status pill
+│   │   ├── views/
+│   │   │   └── Dashboard.vue       # Main view: table + filters + pagination
+│   │   ├── App.vue                 # Renders Dashboard directly (no router)
+│   │   └── main.ts
+│   ├── .env.example                # VITE_API_URL + VITE_JWT_TOKEN
 │   ├── Dockerfile                  # Nginx + Vue build
 │   ├── nginx.conf
 │   └── package.json
@@ -102,10 +105,10 @@ Request → JwtAuthGuard → Controller → Service → Repository (Mongoose Mod
 **Auth assumption:** JWT tokens are issued by an external auth service. This module only verifies the signature using `JWT_SECRET` from `.env`.
 
 ### Frontend
-- JWT token entered once by user on first visit, stored in `localStorage`
-- All API calls go through axios interceptor that attaches `Authorization: Bearer <token>`
-- Status transition rules mirrored on client side to disable invalid options in UI
-- Loading skeleton shown on cold start (Render wakeup delay)
+- JWT token set once in `client/.env` as `VITE_JWT_TOKEN` — picked up by axios at build time
+- No login screen, no router — `App.vue` renders `Dashboard.vue` directly
+- Status transition rules mirrored on client side (`VALID_TRANSITIONS` in `types/truck.ts`) to disable invalid options in status dropdown
+- Loading spinner shown on cold start (Render wakeup delay)
 
 ## Key Domain Concepts
 

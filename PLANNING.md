@@ -121,19 +121,22 @@ Check off steps as you complete them (`[ ]` → `[x]`). Each milestone is indepe
 **Goal:** A fully functional frontend dashboard that covers all API operations — acts as both a UI and an end-to-end verification of all endpoints.
 
 ### Steps
-- [ ] Scaffold Vue 3 + Vite + TypeScript app in `client/`
-- [ ] Install dependencies: `pinia`, `@tanstack/vue-query`, `axios`, `vue-router`
-- [ ] Choose and install UI kit: **PrimeVue** (table, dialog, toast, dropdown built-in)
-- [ ] Create `client/src/api/trucks.ts` — axios instance with Bearer token interceptor
-- [ ] Create JWT input screen — user pastes token once, stored in `localStorage`, used for all requests
-- [ ] Implement `TruckTable` — paginated table with columns: code, name, status (badge), description, actions
-- [ ] Implement filters bar: code (text), name (text), status (dropdown), with debounce
-- [ ] Implement sortable columns (sortBy + sortOrder query params)
-- [ ] Implement `TruckFormModal` — Create / Edit truck (shared form, mode-aware)
-- [ ] Implement Delete confirmation dialog
-- [ ] Implement status change dropdown in table row — disabled options for invalid transitions (client-side rules mirror backend)
-- [ ] Show loading skeleton while API is waking up (cold start UX)
-- [ ] Show toast notifications for success/error on every mutation
+- [x] Scaffold Vue 3 + Vite + TypeScript app in `client/`
+- [x] Install dependencies: `pinia`, `@tanstack/vue-query`, `axios`, `vue-router`
+- [x] Choose and install UI kit: **PrimeVue** (table, dialog, toast, dropdown built-in)
+- [x] Create `client/src/api/trucks.ts` — axios instance with Bearer token interceptor
+- [x] Create JWT input screen — user pastes token once, stored in `localStorage`, used for all requests
+- [x] Implement `TruckTable` — paginated table with columns: code, name, status (badge), description, actions
+- [x] Implement filters bar: code (text), name (text), status (dropdown), with sort order select
+- [x] Implement sortable columns (sortBy + sortOrder query params)
+- [x] Implement `TruckFormModal` — Create / Edit truck (shared form, mode-aware)
+- [x] Implement Delete confirmation dialog
+- [x] Implement status change dropdown in table row — disabled options for invalid transitions (client-side rules mirror backend)
+- [x] Show loading spinner while API is waking up (cold start UX)
+- [x] Show toast notifications for success/error on every mutation
+- [x] Updated `findAll` in `TrucksService` to return `{ data, total, page, limit }` for pagination support
+- [x] Excluded `client/` from NestJS `tsconfig.build.json` to avoid cross-project TS errors
+- [x] Used `const` object + type alias instead of `enum` in `client/src/types/truck.ts` — required by `erasableSyntaxOnly: true` in Vue tsconfig
 
 **Milestone complete when:** All 5 endpoints exercised through the UI; filtering, sorting, pagination, create, edit, delete, status change all work.
 
