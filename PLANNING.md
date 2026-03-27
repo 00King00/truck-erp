@@ -29,13 +29,13 @@ Check off steps as you complete them (`[ ]` → `[x]`). Each milestone is indepe
 **Goal:** Define the Mongoose schema and all request/response DTOs with validation.
 
 ### Steps
-- [ ] Create `TruckStatus` enum at `src/modules/trucks/enums/truck-status.enum.ts`
-- [ ] Create Mongoose schema `src/modules/trucks/schemas/truck.schema.ts`:
+- [x] Create `TruckStatus` enum at `src/modules/trucks/enums/truck-status.enum.ts`
+- [x] Create Mongoose schema `src/modules/trucks/schemas/truck.schema.ts`:
   - Fields: `code` (unique), `name`, `status`, `description` (optional)
   - Add timestamps (`createdAt`, `updatedAt`)
-- [ ] Create `CreateTruckDto` with `class-validator` decorators
-- [ ] Create `UpdateTruckDto` (all fields optional via `PartialType`)
-- [ ] Create `QueryTruckDto` for filtering/sorting/pagination query params:
+- [x] Create `CreateTruckDto` with `class-validator` decorators
+- [x] Create `UpdateTruckDto` (all fields optional via `PartialType`)
+- [x] Create `QueryTruckDto` for filtering/sorting/pagination query params:
   - Optional: `code`, `name`, `status`, `description`, `sortBy`, `sortOrder`, `page`, `limit`
   - Validate `sortOrder` is `asc | desc`, `page`/`limit` are positive integers
 
