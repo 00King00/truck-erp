@@ -35,6 +35,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
       statusCode = HttpStatus.BAD_REQUEST;
       message = `Invalid id: ${exception.value}`;
       error = 'Bad Request';
+    } else if (exception instanceof MongooseError.ValidationError) {
+      statusCode = HttpStatus.UNPROCESSABLE_ENTITY;
+      message = Object.values(exception.errors).map((e) => e.message);
+      error = 'Validation Error';
     } else if (
       exception instanceof MongoServerError &&
       exception.code === 11000

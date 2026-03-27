@@ -91,8 +91,12 @@ export class TrucksService {
       }
     }
 
-    Object.assign(truck, dto);
-    return truck.save();
+    const updated = await this.truckModel
+      .findByIdAndUpdate(id, { $set: dto }, { new: true, runValidators: true })
+      .exec();
+
+    if (!updated) throw new NotFoundException(`Truck ${id} not found`);
+    return updated;
   }
 
   async remove(id: string): Promise<void> {
