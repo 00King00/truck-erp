@@ -13,6 +13,7 @@ A NestJS-based ERP REST API starting with a Truck management module. It supports
 - **Auth:** JWT verification only (`@nestjs/jwt`) — no login endpoint, token issued by external auth service; guard verifies token manually via `JwtService.verify()`; no Passport.js
 - **Testing:** Jest (unit tests only)
 - **API Style:** REST
+- **Docs:** Swagger UI via `@nestjs/swagger` — available at `/api`
 
 ## Architecture
 Layered architecture inside NestJS modules:

@@ -91,11 +91,13 @@ Check off steps as you complete them (`[ ]` → `[x]`). Each milestone is indepe
 **Goal:** Consistent error responses and production-readiness polish.
 
 ### Steps
-- [ ] Create a global `HttpExceptionFilter` that formats all errors as `{ statusCode, message, error }`
-- [ ] Register the filter globally in `main.ts`
-- [ ] Ensure Mongoose `CastError` (invalid ObjectId) is caught and returned as `400 Bad Request`
-- [ ] Ensure duplicate key errors from MongoDB (code 11000) surface as `409 Conflict`
-- [ ] Add `@ApiProperty()` decorators to DTOs and enable Swagger (`@nestjs/swagger`) — optional but recommended
-- [ ] Review and clean up any `any` types
+- [x] Create a global `HttpExceptionFilter` that formats all errors as `{ statusCode, message, error }`
+- [x] Register the filter globally in `main.ts`
+- [x] Ensure Mongoose `CastError` (invalid ObjectId) is caught and returned as `400 Bad Request`
+- [x] Ensure duplicate key errors from MongoDB (code 11000) surface as `409 Conflict`
+- [x] Add `@ApiProperty()` decorators to DTOs and enable Swagger (`@nestjs/swagger`) — optional but recommended
+  > **Note**: Installed `@nestjs/swagger`, added `@ApiProperty`/`@ApiPropertyOptional` to all DTOs, `@ApiTags`/`@ApiBearerAuth` to controller; Swagger UI available at `/api`.
+- [x] Review and clean up any `any` types
+  > **Note**: Replaced `Record<string, any>` with `Record<string, unknown>` in `trucks.service.ts`.
 
 **Milestone complete when:** Invalid ObjectIds return 400, duplicate codes return 409, all other errors return consistent JSON shapes.

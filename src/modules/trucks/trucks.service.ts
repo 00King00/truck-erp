@@ -11,20 +11,7 @@ import { TruckStatus } from './enums/truck-status.enum';
 import { CreateTruckDto } from './dto/create-truck.dto';
 import { UpdateTruckDto } from './dto/update-truck.dto';
 import { QueryTruckDto } from './dto/query-truck.dto';
-
-const VALID_TRANSITIONS: Record<TruckStatus, TruckStatus[]> = {
-  [TruckStatus.OutOfService]: [
-    TruckStatus.Loading,
-    TruckStatus.ToJob,
-    TruckStatus.AtJob,
-    TruckStatus.Returning,
-    TruckStatus.OutOfService,
-  ],
-  [TruckStatus.Loading]: [TruckStatus.ToJob, TruckStatus.OutOfService],
-  [TruckStatus.ToJob]: [TruckStatus.AtJob, TruckStatus.OutOfService],
-  [TruckStatus.AtJob]: [TruckStatus.Returning, TruckStatus.OutOfService],
-  [TruckStatus.Returning]: [TruckStatus.Loading, TruckStatus.OutOfService],
-};
+import { VALID_TRANSITIONS } from './constants/truck-status-transitions';
 
 @Injectable()
 export class TrucksService {
@@ -61,7 +48,7 @@ export class TrucksService {
       limit = 10,
     } = query;
 
-    const filter: Record<string, any> = {};
+    const filter: Record<string, unknown> = {};
 
     if (code) filter.code = { $regex: code, $options: 'i' };
     if (name) filter.name = { $regex: name, $options: 'i' };
