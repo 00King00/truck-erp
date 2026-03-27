@@ -92,7 +92,11 @@ export class TrucksService {
     }
 
     const updated = await this.truckModel
-      .findByIdAndUpdate(id, { $set: dto }, { new: true, runValidators: true })
+      .findByIdAndUpdate(
+        id,
+        { $set: dto },
+        { returnDocument: 'after', runValidators: true },
+      )
       .exec();
 
     if (!updated) throw new NotFoundException(`Truck ${id} not found`);
