@@ -9,16 +9,17 @@ Check off steps as you complete them (`[ ]` → `[x]`). Each milestone is indepe
 **Goal:** Get a running NestJS app with MongoDB connected, JWT verification wired up globally, and global pipes set up. No login endpoint — auth is handled by an external service; this module only verifies tokens.
 
 ### Steps
-- [ ] Initialize NestJS project (`nest new truck-erp` or verify existing scaffold)
-- [ ] Install dependencies: `@nestjs/mongoose mongoose`, `@nestjs/jwt`, `class-validator class-transformer`, `@nestjs/config`
-- [ ] Create `src/config/configuration.ts` — export config factory reading env vars (`MONGODB_URI`, `JWT_SECRET`, `PORT`)
-- [ ] Create `.env.example` with all required env var names (no values)
-- [ ] Wire `ConfigModule` (global) and `MongooseModule` in `AppModule`
-- [ ] Create `src/auth/auth.module.ts` — registers `JwtModule` with `JWT_SECRET` from config; exports `JwtModule`
-- [ ] Create `src/common/guards/jwt-auth.guard.ts` — implements `CanActivate`; extracts Bearer token from `Authorization` header; calls `JwtService.verify()`; throws `UnauthorizedException` on failure
-- [ ] Apply `JwtAuthGuard` globally via `APP_GUARD` in `AppModule`
-- [ ] Set up global `ValidationPipe` in `main.ts` (`whitelist: true`, `forbidNonWhitelisted: true`, `transform: true`)
-- [ ] Verify app starts and connects to MongoDB without errors
+- [x] Initialize NestJS project (`nest new truck-erp` or verify existing scaffold)
+  > **Note**: Scaffolded in `/tmp` to avoid README.md conflict, then copied with rsync excluding README.md. Also removed unused scaffold files: `app.controller.ts`, `app.service.ts`, `app.controller.spec.ts`.
+- [x] Install dependencies: `@nestjs/mongoose mongoose`, `@nestjs/jwt`, `class-validator class-transformer`, `@nestjs/config`
+- [x] Create `src/config/configuration.ts` — export config factory reading env vars (`MONGODB_URI`, `JWT_SECRET`, `PORT`)
+- [x] Create `.env.example` with all required env var names (no values)
+- [x] Wire `ConfigModule` (global) and `MongooseModule` in `AppModule`
+- [x] Create `src/auth/auth.module.ts` — registers `JwtModule` with `JWT_SECRET` from config; exports `JwtModule`
+- [x] Create `src/common/guards/jwt-auth.guard.ts` — implements `CanActivate`; extracts Bearer token from `Authorization` header; calls `JwtService.verify()`; throws `UnauthorizedException` on failure
+- [x] Apply `JwtAuthGuard` globally via `APP_GUARD` in `AppModule`
+- [x] Set up global `ValidationPipe` in `main.ts` (`whitelist: true`, `forbidNonWhitelisted: true`, `transform: true`)
+- [x] Verify app starts and connects to MongoDB without errors
 
 **Milestone complete when:** `npm run start:dev` boots cleanly, MongoDB connection is logged, and requests without a valid JWT return 401.
 
