@@ -108,10 +108,10 @@ Check off steps as you complete them (`[ ]` → `[x]`). Each milestone is indepe
 **Goal:** On startup, if the DB is empty — auto-insert 100 generated trucks with varied statuses so the app is immediately usable for demo and testing.
 
 ### Steps
-- [ ] Create `src/modules/trucks/seeds/truck.seeder.ts` — `SeederService` that checks `count() === 0` and inserts generated data
-- [ ] Generate 100 trucks programmatically: random realistic names, unique codes (e.g. `TRK001`–`TRK100`), evenly distributed statuses, some with descriptions
-- [ ] Register `SeederService` in `TrucksModule` and call it from `onModuleInit` lifecycle hook
-- [ ] Seeder must be idempotent — runs only when collection is empty, never overwrites existing data
+- [x] Create `src/modules/trucks/seeds/truck.seeder.ts` — `SeederService` that checks `count() === 0` and inserts generated data
+- [x] Generate 100 trucks programmatically: random realistic names, unique codes (e.g. `TRK001`–`TRK100`), evenly distributed statuses, some with descriptions
+- [x] Register `SeederService` in `TrucksModule` and call it from `onModuleInit` lifecycle hook
+- [x] Seeder must be idempotent — runs only when collection is empty, never overwrites existing data
 
 **Milestone complete when:** Fresh `docker compose up` → API starts → DB has 100 trucks automatically.
 

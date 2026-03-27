@@ -6,13 +6,13 @@ export type TruckDocument = HydratedDocument<Truck>;
 
 @Schema({ timestamps: true })
 export class Truck {
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true, unique: true, index: true })
   code: string;
 
   @Prop({ required: true })
   name: string;
 
-  @Prop({ required: true, enum: TruckStatus })
+  @Prop({ required: true, enum: TruckStatus, index: true })
   status: TruckStatus;
 
   @Prop()
