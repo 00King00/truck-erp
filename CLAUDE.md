@@ -1,9 +1,11 @@
 # Truck ERP
 
 ## Overview
-A NestJS-based ERP REST API starting with a Truck management module. It supports full CRUD operations on trucks, enforces strict status transition rules, and is designed to be extended with future ERP modules (employees, factories, customers, etc.).
+A NestJS-based ERP REST API with a Vue 3 frontend dashboard. Starts with a Truck management module — full CRUD, strict status transition rules, 100-record seeder, and a dashboard UI for end-to-end testing. Designed to be extended with future ERP modules (employees, factories, customers, etc.).
 
 ## Tech Stack
+
+### Backend (NestJS)
 - **Runtime:** Node.js
 - **Framework:** NestJS
 - **Language:** TypeScript
@@ -15,49 +17,95 @@ A NestJS-based ERP REST API starting with a Truck management module. It supports
 - **API Style:** REST
 - **Docs:** Swagger UI via `@nestjs/swagger` — available at `/api`
 
-## Architecture
-Layered architecture inside NestJS modules:
+### Frontend (Vue 3)
+- **Framework:** Vue 3 + Vite + TypeScript
+- **State:** Pinia
+- **Data fetching:** TanStack Vue Query
+- **HTTP:** Axios with Bearer token interceptor
+- **UI kit:** PrimeVue
+- **Location:** `client/` directory in monorepo
 
+### Infrastructure
+- **Local dev:** Docker Compose (all services in one command)
+- **Database (prod):** MongoDB Atlas M0 (free)
+- **API (prod):** Render Web Service (Docker)
+- **Frontend (prod):** Cloudflare Pages (root: `client/`)
+- **Uptime:** UptimeRobot pings Render every 5 min to prevent sleep
+
+## Project Structure
+```
+truck-erp/
+├── src/                            # NestJS API
+│   ├── app.module.ts
+│   ├── main.ts
+│   ├── common/
+│   │   ├── filters/                # Global exception filter
+│   │   └── guards/                 # JWT auth guard
+│   ├── config/
+│   │   └── configuration.ts        # Config factory (env vars)
+│   ├── auth/
+│   │   └── auth.module.ts
+│   └── modules/
+│       └── trucks/
+│           ├── trucks.module.ts
+│           ├── trucks.controller.ts
+│           ├── trucks.service.ts
+│           ├── constants/
+│           │   └── truck-status-transitions.ts  # VALID_TRANSITIONS map
+│           ├── enums/
+│           │   └── truck-status.enum.ts
+│           ├── schemas/
+│           │   └── truck.schema.ts
+│           ├── dto/
+│           │   ├── create-truck.dto.ts
+│           │   ├── update-truck.dto.ts
+│           │   └── query-truck.dto.ts
+│           ├── seeds/
+│           │   └── truck.seeder.ts             # Auto-seeds 100 trucks if DB empty
+│           └── trucks.service.spec.ts
+├── client/                         # Vue 3 dashboard
+│   ├── src/
+│   │   ├── api/
+│   │   │   └── trucks.ts           # Axios calls
+│   │   ├── stores/
+│   │   │   └── auth.ts             # JWT token (localStorage)
+│   │   ├── components/
+│   │   │   ├── TruckTable.vue
+│   │   │   ├── TruckFormModal.vue
+│   │   │   └── StatusBadge.vue
+│   │   └── views/
+│   │       └── Dashboard.vue
+│   ├── Dockerfile                  # Nginx + Vue build
+│   ├── nginx.conf
+│   └── package.json
+├── Dockerfile                      # NestJS API (multi-stage)
+├── docker-compose.yml              # Local: mongo(27018) + api(3001) + client(8080)
+└── .env.example
+```
+
+## Architecture
+
+### Backend
 ```
 Request → JwtAuthGuard → Controller → Service → Repository (Mongoose Model) → MongoDB
 ```
 
 - **Controllers** — handle HTTP, parse DTOs, return responses
 - **Services** — business logic, status transition validation
+- **Constants** — domain constants (e.g. `VALID_TRANSITIONS`) live in `constants/`, not inside service files
 - **Schemas** — Mongoose schema/model definitions
-- **DTOs** — request/response shapes with class-validator decorators
-- **Guards** — global `JwtAuthGuard` validates Bearer token using shared `JWT_SECRET`; no login/signup here
-- **Filters/Pipes** — global validation pipe, exception filter
+- **DTOs** — request/response shapes with class-validator + swagger decorators
+- **Guards** — global `JwtAuthGuard` validates Bearer token
+- **Filters/Pipes** — global `HttpExceptionFilter`, global `ValidationPipe`
+- **Seeds** — `SeederService` runs on `onModuleInit`, inserts 100 trucks if collection is empty
 
-**Auth assumption:** This service is one module in a larger system. Authentication (login, token issuance) is handled by a separate auth service/microservice. This module only verifies the JWT signature using the shared `JWT_SECRET` from `.env`. No user management, no login endpoint.
+**Auth assumption:** JWT tokens are issued by an external auth service. This module only verifies the signature using `JWT_SECRET` from `.env`.
 
-Each domain (trucks, future modules) lives in its own NestJS feature module under `src/modules/`.
-
-## Project Structure
-```
-src/
-├── app.module.ts               # Root module
-├── main.ts                     # Bootstrap
-├── common/
-│   ├── filters/                # Global exception filters
-│   └── guards/                 # JWT auth guard (verify-only, no login)
-├── config/
-│   └── configuration.ts        # Config factory (env vars)
-├── auth/
-│   └── auth.module.ts          # Registers JwtModule (secret from config)
-└── modules/
-    └── trucks/
-        ├── trucks.module.ts
-        ├── trucks.controller.ts
-        ├── trucks.service.ts
-        ├── schemas/
-        │   └── truck.schema.ts
-        ├── dto/
-        │   ├── create-truck.dto.ts
-        │   ├── update-truck.dto.ts
-        │   └── query-truck.dto.ts
-        └── trucks.service.spec.ts
-```
+### Frontend
+- JWT token entered once by user on first visit, stored in `localStorage`
+- All API calls go through axios interceptor that attaches `Authorization: Bearer <token>`
+- Status transition rules mirrored on client side to disable invalid options in UI
+- Loading skeleton shown on cold start (Render wakeup delay)
 
 ## Key Domain Concepts
 
@@ -80,28 +128,27 @@ Out Of Service | Loading | To Job | At Job | Returning
 - The ordered cycle must be followed: `Loading → To Job → At Job → Returning`
 - `Returning → Loading` is allowed (cycle restarts)
 
-**Diagram:**
 ```
 Out Of Service ⟷ (any status)
 Loading → To Job → At Job → Returning → Loading
 ```
 
-Invalid transitions (e.g., `Loading → At Job`, `Returning → To Job`) must be rejected with a `422 Unprocessable Entity`.
-
-### Filtering & Sorting (List endpoint)
-All fields are filterable: `code`, `name`, `status`, `description`
-All fields are sortable; default sort should be configurable (e.g., by `createdAt` desc)
-Pagination: `page` + `limit` query params
+Invalid transitions must be rejected with `422 Unprocessable Entity` on backend.
+Invalid transition options must be visually disabled in the frontend dropdown.
 
 ## Development Guidelines
 
-### Running locally
+### Running locally (Docker)
 ```bash
-# Install dependencies
-npm install
+docker compose up         # starts mongo + api + client
+# open http://localhost:8080
+```
 
-# Start in dev mode
-npm run start:dev
+### Running locally (without Docker)
+```bash
+npm install
+npm run start:dev         # API on :3000
+cd client && npm install && npm run dev   # Vue on :5173
 ```
 
 ### Environment variables
@@ -120,15 +167,13 @@ npm run test:cov      # with coverage
 
 ### Code conventions
 - Use `async/await`, never raw callbacks
-- DTOs must use `class-validator` decorators
+- DTOs must use `class-validator` + `@ApiProperty` decorators
 - Services throw NestJS `HttpException` subclasses (`NotFoundException`, `ConflictException`, `UnprocessableEntityException`)
 - No business logic in controllers
-- All routes protected by `JwtAuthGuard` (applied globally or at controller level)
+- Domain constants (transition maps, enums data) go in `constants/`, not inlined in service files
+- All routes protected by `JwtAuthGuard` globally
 
 ## API Reference
-
-### Auth
-No auth endpoints in this service. JWT tokens are issued by an external auth service. All routes in this service require a valid `Authorization: Bearer <token>` header.
 
 ### Trucks
 | Method | Path          | Description                        |
@@ -140,19 +185,21 @@ No auth endpoints in this service. JWT tokens are issued by an external auth ser
 | DELETE | /trucks/:id   | Delete truck                       |
 
 #### List query params
-| Param       | Type   | Description                          |
-|-------------|--------|--------------------------------------|
-| code        | string | Filter by code (partial match ok)    |
-| name        | string | Filter by name (partial match ok)    |
-| status      | enum   | Filter by exact status               |
-| description | string | Filter by description (partial)      |
-| sortBy      | string | Field to sort by (default: createdAt)|
-| sortOrder   | asc\|desc | Sort direction (default: desc)   |
-| page        | number | Page number (default: 1)             |
-| limit       | number | Items per page (default: 10)         |
+| Param       | Type      | Description                          |
+|-------------|-----------|--------------------------------------|
+| code        | string    | Filter by code (partial match)       |
+| name        | string    | Filter by name (partial match)       |
+| status      | enum      | Filter by exact status               |
+| description | string    | Filter by description (partial)      |
+| sortBy      | string    | Field to sort by (default: createdAt)|
+| sortOrder   | asc\|desc | Sort direction (default: desc)       |
+| page        | number    | Page number (default: 1)             |
+| limit       | number    | Items per page (default: 10)         |
 
 ## Important Constraints
-- `code` must be unique across all trucks — return `409 Conflict` on duplicate
-- Status transitions must be validated on every PATCH that includes `status` — return `422 Unprocessable Entity` for invalid transitions
-- The transition logic lives exclusively in `TrucksService`, never in the controller or schema
-- Future ERP modules must follow the same module structure under `src/modules/`
+- `code` must be unique — return `409 Conflict` on duplicate
+- Status transitions validated on every PATCH with `status` — return `422` for invalid
+- Transition logic lives in `TrucksService` only, never in controller or schema
+- `VALID_TRANSITIONS` map lives in `constants/truck-status-transitions.ts`, not in service file
+- Seeder is idempotent — only runs when collection is empty, never overwrites data
+- Future ERP modules follow the same structure under `src/modules/`

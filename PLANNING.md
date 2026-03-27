@@ -101,3 +101,71 @@ Check off steps as you complete them (`[ ]` → `[x]`). Each milestone is indepe
   > **Note**: Replaced `Record<string, any>` with `Record<string, unknown>` in `trucks.service.ts`.
 
 **Milestone complete when:** Invalid ObjectIds return 400, duplicate codes return 409, all other errors return consistent JSON shapes.
+
+---
+
+## Milestone 6: Database Seeder
+**Goal:** On startup, if the DB is empty — auto-insert 100 generated trucks with varied statuses so the app is immediately usable for demo and testing.
+
+### Steps
+- [ ] Create `src/modules/trucks/seeds/truck.seeder.ts` — `SeederService` that checks `count() === 0` and inserts generated data
+- [ ] Generate 100 trucks programmatically: random realistic names, unique codes (e.g. `TRK001`–`TRK100`), evenly distributed statuses, some with descriptions
+- [ ] Register `SeederService` in `TrucksModule` and call it from `onModuleInit` lifecycle hook
+- [ ] Seeder must be idempotent — runs only when collection is empty, never overwrites existing data
+
+**Milestone complete when:** Fresh `docker compose up` → API starts → DB has 100 trucks automatically.
+
+---
+
+## Milestone 7: Vue 3 Dashboard (client/)
+**Goal:** A fully functional frontend dashboard that covers all API operations — acts as both a UI and an end-to-end verification of all endpoints.
+
+### Steps
+- [ ] Scaffold Vue 3 + Vite + TypeScript app in `client/`
+- [ ] Install dependencies: `pinia`, `@tanstack/vue-query`, `axios`, `vue-router`
+- [ ] Choose and install UI kit: **PrimeVue** (table, dialog, toast, dropdown built-in)
+- [ ] Create `client/src/api/trucks.ts` — axios instance with Bearer token interceptor
+- [ ] Create JWT input screen — user pastes token once, stored in `localStorage`, used for all requests
+- [ ] Implement `TruckTable` — paginated table with columns: code, name, status (badge), description, actions
+- [ ] Implement filters bar: code (text), name (text), status (dropdown), with debounce
+- [ ] Implement sortable columns (sortBy + sortOrder query params)
+- [ ] Implement `TruckFormModal` — Create / Edit truck (shared form, mode-aware)
+- [ ] Implement Delete confirmation dialog
+- [ ] Implement status change dropdown in table row — disabled options for invalid transitions (client-side rules mirror backend)
+- [ ] Show loading skeleton while API is waking up (cold start UX)
+- [ ] Show toast notifications for success/error on every mutation
+
+**Milestone complete when:** All 5 endpoints exercised through the UI; filtering, sorting, pagination, create, edit, delete, status change all work.
+
+---
+
+## Milestone 8: Docker Setup
+**Goal:** Single `docker compose up` starts everything locally without conflicts with existing containers.
+
+### Steps
+- [ ] Create `Dockerfile` for NestJS API (multi-stage: build → production)
+- [ ] Create `client/Dockerfile` for Vue + Nginx (multi-stage: build → nginx:alpine)
+- [ ] Create `client/nginx.conf` — serve static files, proxy `/api` to backend, handle SPA routing
+- [ ] Create `docker-compose.yml`:
+  - `mongo` on port `27018:27017` (avoids conflict with existing local MongoDB)
+  - `api` on port `3001:3000`
+  - `client` on port `8080:80`
+  - `api` depends on `mongo`, waits for it to be healthy
+- [ ] Add `.env.example` entries for Docker ports (so user can override if needed)
+- [ ] Verify `docker compose up` → open `localhost:8080` → dashboard works end-to-end
+
+**Milestone complete when:** `git clone → docker compose up → localhost:8080` works with zero manual configuration.
+
+---
+
+## Milestone 9: Deployment
+**Goal:** Live deployment accessible via public URLs.
+
+### Steps
+- [ ] Create MongoDB Atlas M0 cluster (free, no card) — get `MONGODB_URI`
+- [ ] Deploy NestJS API to Render (Web Service, Docker) — set `MONGODB_URI`, `JWT_SECRET`, `PORT` env vars
+- [ ] Set up UptimeRobot — monitor Render API URL every 5 min to prevent sleep
+- [ ] Deploy Vue client to Cloudflare Pages — root directory: `client/`, set `VITE_API_URL` to Render URL
+- [ ] Verify full flow on production URLs
+
+**Milestone complete when:** Public URL opens dashboard, all operations work against Atlas DB.
