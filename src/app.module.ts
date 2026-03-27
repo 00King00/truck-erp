@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthModule } from './auth/auth.module';
+import { TrucksModule } from './modules/trucks/trucks.module';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import configuration from './config/configuration';
 
@@ -19,6 +20,7 @@ import configuration from './config/configuration';
       }),
     }),
     AuthModule,
+    TrucksModule,
   ],
   providers: [
     {

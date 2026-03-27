@@ -76,11 +76,11 @@ Check off steps as you complete them (`[ ]` → `[x]`). Each milestone is indepe
 **Goal:** Expose all truck endpoints via HTTP and wire up the full module.
 
 ### Steps
-- [ ] Create `TrucksController` with all 5 routes (POST, GET list, GET one, PATCH, DELETE)
-- [ ] Use `@Query()`, `@Param()`, `@Body()` decorators with the correct DTOs
-- [ ] Apply `JwtAuthGuard` to the controller (if not already global)
-- [ ] Register `TrucksModule` in `AppModule`
-- [ ] Return appropriate HTTP status codes (`201` for create, `200` for others, `204` for delete)
+- [x] Create `TrucksController` with all 5 routes (POST, GET list, GET one, PATCH, DELETE)
+- [x] Use `@Query()`, `@Param()`, `@Body()` decorators with the correct DTOs
+- [x] Apply `JwtAuthGuard` to the controller (if not already global)
+- [x] Register `TrucksModule` in `AppModule`
+- [x] Return appropriate HTTP status codes (`201` for create, `200` for others, `204` for delete)
 - [ ] Manual smoke test all endpoints with a REST client (e.g., curl or Postman)
 
 **Milestone complete when:** All 5 endpoints respond correctly; auth is enforced; filtering, sorting, and pagination work on the list endpoint.
