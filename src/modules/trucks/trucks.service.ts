@@ -36,7 +36,12 @@ export class TrucksService {
     }
   }
 
-  async findAll(query: QueryTruckDto): Promise<TruckDocument[]> {
+  async findAll(query: QueryTruckDto): Promise<{
+    data: TruckDocument[];
+    total: number;
+    page: number;
+    limit: number;
+  }> {
     const {
       code,
       name,
@@ -56,12 +61,17 @@ export class TrucksService {
       filter.description = { $regex: description, $options: 'i' };
     if (status) filter.status = status;
 
-    return this.truckModel
-      .find(filter)
-      .sort({ [sortBy]: sortOrder === 'asc' ? 1 : -1 })
-      .skip((page - 1) * limit)
-      .limit(limit)
-      .exec();
+    const [data, total] = await Promise.all([
+      this.truckModel
+        .find(filter)
+        .sort({ [sortBy]: sortOrder === 'asc' ? 1 : -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .exec(),
+      this.truckModel.countDocuments(filter),
+    ]);
+
+    return { data, total, page, limit };
   }
 
   async findOne(id: string): Promise<TruckDocument> {
