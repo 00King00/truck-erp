@@ -47,22 +47,22 @@ Check off steps as you complete them (`[ ]` → `[x]`). Each milestone is indepe
 **Goal:** Core business logic — CRUD operations and status transition enforcement.
 
 ### Steps
-- [ ] Create `TrucksModule` and `TrucksService` at `src/modules/trucks/`
-- [ ] Implement `create()` — insert truck, handle duplicate `code` with `ConflictException`
-- [ ] Implement `findAll()` — build a dynamic Mongoose query from `QueryTruckDto`:
+- [x] Create `TrucksModule` and `TrucksService` at `src/modules/trucks/`
+- [x] Implement `create()` — insert truck, handle duplicate `code` with `ConflictException`
+- [x] Implement `findAll()` — build a dynamic Mongoose query from `QueryTruckDto`:
   - Partial string match (regex) for `code`, `name`, `description`
   - Exact match for `status`
   - Dynamic `sort()` from `sortBy` + `sortOrder`
   - Pagination via `skip()` + `limit()`
-- [ ] Implement `findOne()` — find by MongoDB `_id`, throw `NotFoundException` if missing
-- [ ] Implement `update()`:
+- [x] Implement `findOne()` — find by MongoDB `_id`, throw `NotFoundException` if missing
+- [x] Implement `update()`:
   - Find existing truck
   - If `status` is being changed, validate transition using the rules from CLAUDE.md
   - Throw `UnprocessableEntityException` for invalid transitions
   - Save and return updated truck
-- [ ] Implement `remove()` — find and delete, throw `NotFoundException` if missing
-- [ ] Encapsulate status transition logic in a private `isValidTransition(from, to)` method
-- [ ] Write unit tests for `TrucksService`:
+- [x] Implement `remove()` — find and delete, throw `NotFoundException` if missing
+- [x] Encapsulate status transition logic in a private `isValidTransition(from, to)` method
+- [x] Write unit tests for `TrucksService`:
   - All valid status transitions pass
   - All invalid transitions throw `UnprocessableEntityException`
   - Duplicate `code` throws `ConflictException`
