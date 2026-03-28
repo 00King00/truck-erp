@@ -4,7 +4,8 @@ WORKDIR /app
 COPY client/package*.json ./client/
 RUN cd client && npm ci
 COPY client/ ./client/
-COPY .env* ./
+ARG VITE_JWT_TOKEN
+ENV VITE_JWT_TOKEN=$VITE_JWT_TOKEN
 RUN cd client && npm run build
 
 # Stage 2: Build NestJS API
