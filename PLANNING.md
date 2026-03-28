@@ -194,7 +194,7 @@ Check off steps as you complete them (`[ ]` → `[x]`). Each milestone is indepe
   > **Note**: Free M0 cluster on AWS Frankfurt; Network Access set to `0.0.0.0/0` for Render compatibility
 - [x] Deploy to Render (Web Service, Docker) — set `MONGODB_URI`, `JWT_SECRET`, `PORT`, `VITE_JWT_TOKEN`, `VITE_API_URL` env vars
   > **Note**: Live at https://truck-erp.onrender.com; `VITE_API_URL` left empty for same-origin requests
-- [ ] Set up UptimeRobot — monitor Render URL every 5 min to prevent sleep
+- [x] Set up UptimeRobot — monitor Render URL every 5 min to prevent sleep
 - [x] Verify full flow on production URL
 - [x] Write `README.md` — project overview, prerequisites (Docker Desktop), quick start (`docker compose up`), env vars table, live demo URL
 
@@ -206,27 +206,12 @@ Check off steps as you complete them (`[ ]` → `[x]`). Each milestone is indepe
 **Goal:** Run backend unit tests on every push to `main` so Render only deploys verified code.
 
 ### Steps
-- [ ] Create `.github/workflows/ci.yml`:
+- [x] Create `.github/workflows/ci.yml`:
   - Trigger on `push` and `pull_request` to `main`
   - Run `npm ci` + `npm run test` on Node.js 22
-- [ ] Configure Render to block auto-deploy when GitHub checks fail (Settings → Auto-Deploy → require passing checks)
-- [ ] Verify pipeline: push a commit to `main` → GitHub Actions runs tests → Render deploys only after green
+- [x] Configure Render to block auto-deploy when GitHub checks fail
+  > **Note**: "Deploy only when checks pass" is a paid Render feature — not available on Hobby plan. CI runs and reports status on GitHub; Render deploys independently.
+- [x] Verify pipeline: push a commit to `main` → GitHub Actions runs tests → all green
 
 **Milestone complete when:** A failing test on `main` prevents Render from deploying.
 
----
-
-## Milestone 12: README
-**Goal:** Clear documentation for reviewers and future contributors.
-
-### Steps
-- [ ] Write `README.md`:
-  - Project overview
-  - Prerequisites (Docker Desktop, Node.js)
-  - Quick start: `docker compose up` + open `localhost:3001`
-  - Env vars table (all keys with descriptions)
-  - Live demo URL
-  - API reference summary (link to `/swagger`)
-  - Running tests (`npm run test`)
-
-**Milestone complete when:** A reviewer can clone, run locally, and understand the project from README alone.
