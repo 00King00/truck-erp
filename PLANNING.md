@@ -143,21 +143,23 @@ Check off steps as you complete them (`[ ]` → `[x]`). Each milestone is indepe
 ---
 
 ## Milestone 8: Docker Setup
-**Goal:** Single `docker compose up` starts everything locally without conflicts with existing containers.
+**Goal:** Single `docker compose up` starts everything locally. One container serves both API and Vue frontend — NestJS builds Vue as static files and serves them via `ServeStaticModule`. No Nginx, no separate client container.
 
 ### Steps
-- [ ] Create `Dockerfile` for NestJS API (multi-stage: build → production)
-- [ ] Create `client/Dockerfile` for Vue + Nginx (multi-stage: build → nginx:alpine)
-- [ ] Create `client/nginx.conf` — serve static files, proxy `/api` to backend, handle SPA routing
+- [ ] Configure `client/vite.config.ts` — set `outDir: '../public'` and `envDir: '../'` so Vue builds into repo root and reads `.env` from root
+- [ ] Install `@nestjs/serve-static` and register `ServeStaticModule` in `AppModule` — serve `public/` dir, exclude `/trucks*` and `/api*`
+- [ ] Update root `.env.example` — add `VITE_JWT_TOKEN` and `VITE_API_URL` (single `.env` for both API and client)
+- [ ] Create multi-stage `Dockerfile`:
+  - Stage 1: build Vue (`node:22-alpine`, `npm run build` in `client/`) → outputs to `public/`
+  - Stage 2: build NestJS (`npm run build`) → outputs to `dist/`
+  - Stage 3: production image — copy `dist/`, `public/`, `node_modules/`, run `node dist/main`
 - [ ] Create `docker-compose.yml`:
   - `mongo` on port `27018:27017` (avoids conflict with existing local MongoDB)
-  - `api` on port `3001:3000`
-  - `client` on port `8080:80`
-  - `api` depends on `mongo`, waits for it to be healthy
-- [ ] Add `.env.example` entries for Docker ports (so user can override if needed)
-- [ ] Verify `docker compose up` → open `localhost:8080` → dashboard works end-to-end
+  - `app` on port `3001:3000` (API + Vue in one container)
+  - `app` depends on `mongo` with healthcheck
+- [ ] Verify `docker compose up` → open `localhost:3001` → dashboard loads, all API calls work
 
-**Milestone complete when:** `git clone → docker compose up → localhost:8080` works with zero manual configuration.
+**Milestone complete when:** `git clone → cp .env.example .env → docker compose up → localhost:3001` works with zero manual configuration.
 
 ---
 
@@ -166,9 +168,8 @@ Check off steps as you complete them (`[ ]` → `[x]`). Each milestone is indepe
 
 ### Steps
 - [ ] Create MongoDB Atlas M0 cluster (free, no card) — get `MONGODB_URI`
-- [ ] Deploy NestJS API to Render (Web Service, Docker) — set `MONGODB_URI`, `JWT_SECRET`, `PORT` env vars
-- [ ] Set up UptimeRobot — monitor Render API URL every 5 min to prevent sleep
-- [ ] Deploy Vue client to Cloudflare Pages — root directory: `client/`, set `VITE_API_URL` to Render URL
-- [ ] Verify full flow on production URLs
+- [ ] Deploy to Render (Web Service, Docker) — set `MONGODB_URI`, `JWT_SECRET`, `PORT`, `VITE_JWT_TOKEN`, `VITE_API_URL` env vars
+- [ ] Set up UptimeRobot — monitor Render URL every 5 min to prevent sleep
+- [ ] Verify full flow on production URL
 
 **Milestone complete when:** Public URL opens dashboard, all operations work against Atlas DB.

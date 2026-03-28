@@ -27,10 +27,12 @@ A NestJS-based ERP REST API with a Vue 3 frontend dashboard. Starts with a Truck
 - **No router** — single-page dashboard, `App.vue` renders `Dashboard.vue` directly
 
 ### Infrastructure
-- **Local dev:** Docker Compose (all services in one command)
+- **Local dev:** Docker Compose — one `app` container (NestJS + Vue static) + `mongo`
+- **Serving frontend:** `ServeStaticModule` serves `public/` dir from NestJS — no Nginx, no separate container
+- **Vue build output:** `client/vite.config.ts` sets `outDir: '../public'` and `envDir: '../'`
+- **Single `.env`:** root `.env` covers both API vars (`MONGODB_URI`, `JWT_SECRET`) and client vars (`VITE_JWT_TOKEN`, `VITE_API_URL`)
 - **Database (prod):** MongoDB Atlas M0 (free)
-- **API (prod):** Render Web Service (Docker)
-- **Frontend (prod):** Cloudflare Pages (root: `client/`)
+- **API + Frontend (prod):** Render Web Service (single Docker container)
 - **Uptime:** UptimeRobot pings Render every 5 min to prevent sleep
 
 ## Project Structure
@@ -67,7 +69,7 @@ truck-erp/
 ├── client/                         # Vue 3 dashboard
 │   ├── src/
 │   │   ├── api/
-│   │   │   └── trucks.ts           # Axios instance (VITE_JWT_TOKEN from .env)
+│   │   │   └── trucks.ts           # Axios instance (VITE_JWT_TOKEN from root .env)
 │   │   ├── types/
 │   │   │   └── truck.ts            # Truck types, TruckStatus const, VALID_TRANSITIONS
 │   │   ├── components/
@@ -77,10 +79,12 @@ truck-erp/
 │   │   │   └── Dashboard.vue       # Main view: table + filters + pagination
 │   │   ├── App.vue                 # Renders Dashboard directly (no router)
 │   │   └── main.ts
-│   ├── .env.example                # VITE_API_URL + VITE_JWT_TOKEN
-│   ├── Dockerfile                  # Nginx + Vue build
-│   ├── nginx.conf
+│   ├── vite.config.ts              # outDir: '../public', envDir: '../'
 │   └── package.json
+├── public/                         # Vue build output (gitignored)
+├── Dockerfile                      # Multi-stage: build Vue → build NestJS → production
+├── docker-compose.yml              # Local: mongo(27018) + app(3001)
+└── .env.example                    # All vars: MONGODB_URI, JWT_SECRET, VITE_JWT_TOKEN, VITE_API_URL
 ├── Dockerfile                      # NestJS API (multi-stage)
 ├── docker-compose.yml              # Local: mongo(27018) + api(3001) + client(8080)
 └── .env.example
