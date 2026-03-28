@@ -1,6 +1,7 @@
 services:
   mongo:
     image: mongo:7
+    container_name: truck-erp-mongo
     restart: unless-stopped
     ports:
       - "27018:27017"
@@ -14,6 +15,7 @@ services:
 
   app:
     build: .
+    container_name: truck-erp-app
     restart: unless-stopped
     ports:
       - "3001:3000"
