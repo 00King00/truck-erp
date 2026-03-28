@@ -168,7 +168,7 @@ Check off steps as you complete them (`[ ]` → `[x]`). Each milestone is indepe
 **Goal:** Full unit test coverage for backend business logic — service, guard, filter.
 
 ### Steps
-- [ ] `TrucksService` — expand existing spec:
+- [x] `TrucksService` — expand existing spec:
   - `create()` — success, duplicate code → 409
   - `findAll()` — returns paginated `{ data, total, page, limit }`
   - `findOne()` — found, not found → 404
@@ -176,8 +176,10 @@ Check off steps as you complete them (`[ ]` → `[x]`). Each milestone is indepe
   - `remove()` — success, not found → 404
   - All valid status transitions pass
   - All invalid status transitions throw 422
-- [ ] `JwtAuthGuard` — valid token passes, missing token → 401, invalid token → 401
-- [ ] `HttpExceptionFilter` — HttpException, CastError → 400, ValidationError → 422, MongoServerError 11000 → 409, unknown error → 500
+- [x] `JwtAuthGuard` — valid token passes, missing token → 401, invalid token → 401
+- [x] `HttpExceptionFilter` — HttpException, CastError → 400, ValidationError → 422, MongoServerError 11000 → 409, unknown error → 500
+- [x] `TrucksController` — each route delegates to correct service method with correct args
+- [x] `TrucksModule` — compiles and resolves all providers (TrucksService, TrucksController, TruckSeederService)
 
 **Milestone complete when:** `npm run test` passes with full coverage on service, guard, and filter.
 
