@@ -164,13 +164,33 @@ Check off steps as you complete them (`[ ]` → `[x]`). Each milestone is indepe
 
 ---
 
-## Milestone 9: Deployment
-**Goal:** Live deployment accessible via public URLs.
+## Milestone 9: Unit Tests (Backend)
+**Goal:** Full unit test coverage for backend business logic — service, guard, filter.
+
+### Steps
+- [ ] `TrucksService` — expand existing spec:
+  - `create()` — success, duplicate code → 409
+  - `findAll()` — returns paginated `{ data, total, page, limit }`
+  - `findOne()` — found, not found → 404
+  - `update()` — success, invalid status transition → 422, not found → 404
+  - `remove()` — success, not found → 404
+  - All valid status transitions pass
+  - All invalid status transitions throw 422
+- [ ] `JwtAuthGuard` — valid token passes, missing token → 401, invalid token → 401
+- [ ] `HttpExceptionFilter` — HttpException, CastError → 400, ValidationError → 422, MongoServerError 11000 → 409, unknown error → 500
+
+**Milestone complete when:** `npm run test` passes with full coverage on service, guard, and filter.
+
+---
+
+## Milestone 10: Deployment & README
+**Goal:** Live deployment accessible via public URLs + README for reviewers.
 
 ### Steps
 - [ ] Create MongoDB Atlas M0 cluster (free, no card) — get `MONGODB_URI`
 - [ ] Deploy to Render (Web Service, Docker) — set `MONGODB_URI`, `JWT_SECRET`, `PORT`, `VITE_JWT_TOKEN`, `VITE_API_URL` env vars
 - [ ] Set up UptimeRobot — monitor Render URL every 5 min to prevent sleep
 - [ ] Verify full flow on production URL
+- [ ] Write `README.md` — project overview, prerequisites (Docker Desktop), quick start (`docker compose up`), env vars table, live demo URL
 
-**Milestone complete when:** Public URL opens dashboard, all operations work against Atlas DB.
+**Milestone complete when:** Public URL opens dashboard, all operations work against Atlas DB, README covers everything a reviewer needs.
