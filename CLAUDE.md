@@ -15,13 +15,14 @@ A NestJS-based ERP REST API with a Vue 3 frontend dashboard. Starts with a Truck
 - **Auth:** JWT verification only (`@nestjs/jwt`) — no login endpoint, token issued by external auth service; guard verifies token manually via `JwtService.verify()`; no Passport.js
 - **Testing:** Jest (unit tests only)
 - **API Style:** REST
-- **Docs:** Swagger UI via `@nestjs/swagger` — available at `/api`
+- **Docs:** Swagger UI via `@nestjs/swagger` — available at `/swagger`
+- **Global prefix:** All REST endpoints are prefixed with `/api` (e.g. `/api/trucks`)
 
 ### Frontend (Vue 3)
 - **Framework:** Vue 3 + Vite + TypeScript
 - **State:** Pinia (minimal, no auth store)
 - **Data fetching:** TanStack Vue Query
-- **HTTP:** Axios — JWT token hardcoded via `VITE_JWT_TOKEN` env var, set in `client/.env`
+- **HTTP:** Axios — JWT token hardcoded via `VITE_JWT_TOKEN` env var, set in `client/.env`; `baseURL` includes `/api` prefix
 - **UI kit:** PrimeVue (Aura theme)
 - **Location:** `client/` directory in monorepo
 - **No router** — single-page dashboard, `App.vue` renders `Dashboard.vue` directly
@@ -183,13 +184,13 @@ npm run test:cov      # with coverage
 ## API Reference
 
 ### Trucks
-| Method | Path          | Description                        |
-|--------|---------------|------------------------------------|
-| POST   | /trucks       | Create a truck                     |
-| GET    | /trucks       | List trucks (filter + sort + page) |
-| GET    | /trucks/:id   | Get single truck                   |
-| PATCH  | /trucks/:id   | Update truck (incl. status change) |
-| DELETE | /trucks/:id   | Delete truck                       |
+| Method | Path              | Description                        |
+|--------|-------------------|------------------------------------|
+| POST   | /api/trucks       | Create a truck                     |
+| GET    | /api/trucks       | List trucks (filter + sort + page) |
+| GET    | /api/trucks/:id   | Get single truck                   |
+| PATCH  | /api/trucks/:id   | Update truck (incl. status change) |
+| DELETE | /api/trucks/:id   | Delete truck                       |
 
 #### List query params
 | Param       | Type      | Description                          |

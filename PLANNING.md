@@ -96,7 +96,8 @@ Check off steps as you complete them (`[ ]` → `[x]`). Each milestone is indepe
 - [x] Ensure Mongoose `CastError` (invalid ObjectId) is caught and returned as `400 Bad Request`
 - [x] Ensure duplicate key errors from MongoDB (code 11000) surface as `409 Conflict`
 - [x] Add `@ApiProperty()` decorators to DTOs and enable Swagger (`@nestjs/swagger`) — optional but recommended
-  > **Note**: Installed `@nestjs/swagger`, added `@ApiProperty`/`@ApiPropertyOptional` to all DTOs, `@ApiTags`/`@ApiBearerAuth` to controller; Swagger UI available at `/api`.
+  > **Note**: Installed `@nestjs/swagger`, added `@ApiProperty`/`@ApiPropertyOptional` to all DTOs, `@ApiTags`/`@ApiBearerAuth` to controller; Swagger UI available at `/swagger`.
+- [x] Set global API prefix `/api` via `app.setGlobalPrefix('api')` in `main.ts` — all REST endpoints are now under `/api/*`; frontend axios `baseURL` updated accordingly
 - [x] Review and clean up any `any` types
   > **Note**: Replaced `Record<string, any>` with `Record<string, unknown>` in `trucks.service.ts`.
 
@@ -147,7 +148,7 @@ Check off steps as you complete them (`[ ]` → `[x]`). Each milestone is indepe
 
 ### Steps
 - [x] Configure `client/vite.config.ts` — set `outDir: '../public'` and `envDir: '../'` so Vue builds into repo root and reads `.env` from root
-- [x] Install `@nestjs/serve-static` and register `ServeStaticModule` in `AppModule` — serve `public/` dir, exclude `/trucks*` and `/api*`
+- [x] Install `@nestjs/serve-static` and register `ServeStaticModule` in `AppModule` — serve `public/` dir, exclude `/api*`
 - [x] Update root `.env.example` — add `VITE_JWT_TOKEN` and `VITE_API_URL` (single `.env` for both API and client)
 - [x] Add `public/` to `.gitignore`
 - [x] Create multi-stage `Dockerfile`:

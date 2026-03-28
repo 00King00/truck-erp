@@ -7,7 +7,7 @@ import type {
 } from '../types/truck';
 
 const api = axios.create({
-  baseURL: (import.meta.env.VITE_API_URL as string) || '',
+  baseURL: `${(import.meta.env.VITE_API_URL as string) || ''}/api`,
   headers: {
     Authorization: `Bearer ${import.meta.env.VITE_JWT_TOKEN ?? ''}`,
   },
