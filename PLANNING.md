@@ -146,14 +146,15 @@ Check off steps as you complete them (`[ ]` → `[x]`). Each milestone is indepe
 **Goal:** Single `docker compose up` starts everything locally. One container serves both API and Vue frontend — NestJS builds Vue as static files and serves them via `ServeStaticModule`. No Nginx, no separate client container.
 
 ### Steps
-- [ ] Configure `client/vite.config.ts` — set `outDir: '../public'` and `envDir: '../'` so Vue builds into repo root and reads `.env` from root
-- [ ] Install `@nestjs/serve-static` and register `ServeStaticModule` in `AppModule` — serve `public/` dir, exclude `/trucks*` and `/api*`
-- [ ] Update root `.env.example` — add `VITE_JWT_TOKEN` and `VITE_API_URL` (single `.env` for both API and client)
-- [ ] Create multi-stage `Dockerfile`:
+- [x] Configure `client/vite.config.ts` — set `outDir: '../public'` and `envDir: '../'` so Vue builds into repo root and reads `.env` from root
+- [x] Install `@nestjs/serve-static` and register `ServeStaticModule` in `AppModule` — serve `public/` dir, exclude `/trucks*` and `/api*`
+- [x] Update root `.env.example` — add `VITE_JWT_TOKEN` and `VITE_API_URL` (single `.env` for both API and client)
+- [x] Add `public/` to `.gitignore`
+- [x] Create multi-stage `Dockerfile`:
   - Stage 1: build Vue (`node:22-alpine`, `npm run build` in `client/`) → outputs to `public/`
   - Stage 2: build NestJS (`npm run build`) → outputs to `dist/`
   - Stage 3: production image — copy `dist/`, `public/`, `node_modules/`, run `node dist/main`
-- [ ] Create `docker-compose.yml`:
+- [x] Create `docker-compose.yml`:
   - `mongo` on port `27018:27017` (avoids conflict with existing local MongoDB)
   - `app` on port `3001:3000` (API + Vue in one container)
   - `app` depends on `mongo` with healthcheck
