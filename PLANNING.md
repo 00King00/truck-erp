@@ -215,3 +215,21 @@ Check off steps as you complete them (`[ ]` → `[x]`). Each milestone is indepe
 
 **Milestone complete when:** A failing test on `main` prevents Render from deploying.
 
+---
+
+## Milestone 12: Architecture Improvements — Custom Model Provider Pattern
+
+**Goal:** Decouple services from Mongoose-specific DI (`@InjectModel`) by introducing a custom model provider layer. Improves testability, framework independence, and sets a scalable pattern for future ERP modules.
+
+### Steps
+- [x] Create `src/common/utils/create-model-provider.ts` — generic factory `createModelProvider<TDocument>(cls, schema)` that produces a NestJS custom provider; token is auto-generated as `${cls.name}Model` (e.g. `Truck` → `'TruckModel'`)
+- [x] Create `src/modules/trucks/models/truck.model.ts` — defines `TruckModel` type alias (`Model<TruckDocument>`) and `truckModelProvider` using the generic factory
+- [x] Remove `MongooseModule.forFeature(...)` from `TrucksModule` — replaced by `truckModelProvider` in `providers[]`
+- [x] Update `TrucksService` — replace `@InjectModel(Truck.name)` + `Model<TruckDocument>` with `@Inject('TruckModel')` + `TruckModel`
+- [x] Update `TruckSeederService` — same injection pattern as service
+- [x] Create `src/modules/trucks/dto/index.ts` — barrel export for all DTOs; updated imports in service and controller to use `from './dto'`
+- [x] Update `trucks.module.spec.ts` — replace `getModelToken(Truck.name)` override with `{ provide: 'TruckModel', useValue: mockModel }`; removed full module import to avoid real Mongoose connection in tests
+- [x] Verify all 51 tests pass (`npm run test`)
+
+**Milestone complete when:** All tests pass, no `@InjectModel` or `MongooseModule.forFeature` remain in the trucks module.
+

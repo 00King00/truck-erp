@@ -1,7 +1,5 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Truck, TruckDocument } from '../schemas/truck.schema';
+import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { TruckModel } from '../models/truck.model';
 import { TruckStatus } from '../enums/truck-status.enum';
 
 const TRUCK_NAMES = [
@@ -72,9 +70,7 @@ function generateTrucks(count: number) {
 export class TruckSeederService implements OnModuleInit {
   private readonly logger = new Logger(TruckSeederService.name);
 
-  constructor(
-    @InjectModel(Truck.name) private readonly truckModel: Model<TruckDocument>,
-  ) {}
+  constructor(@Inject('TruckModel') private readonly truckModel: TruckModel) {}
 
   async onModuleInit(): Promise<void> {
     const count = await this.truckModel.countDocuments();

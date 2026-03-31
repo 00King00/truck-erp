@@ -44,7 +44,9 @@ truck-erp/
 │   ├── main.ts
 │   ├── common/
 │   │   ├── filters/                # Global exception filter
-│   │   └── guards/                 # JWT auth guard
+│   │   ├── guards/                 # JWT auth guard
+│   │   └── utils/
+│   │       └── create-model-provider.ts  # Generic custom provider factory
 │   ├── config/
 │   │   └── configuration.ts        # Config factory (env vars)
 │   ├── auth/
@@ -59,8 +61,11 @@ truck-erp/
 │           ├── enums/
 │           │   └── truck-status.enum.ts
 │           ├── schemas/
-│           │   └── truck.schema.ts
+│           │   └── truck.schema.ts              # Mongoose schema + TruckDocument type
+│           ├── models/
+│           │   └── truck.model.ts               # TruckModel type + truckModelProvider
 │           ├── dto/
+│           │   ├── index.ts                     # Barrel export for all DTOs
 │           │   ├── create-truck.dto.ts
 │           │   ├── update-truck.dto.ts
 │           │   └── query-truck.dto.ts
@@ -101,13 +106,54 @@ Request → JwtAuthGuard → Controller → Service → Repository (Mongoose Mod
 - **Controllers** — handle HTTP, parse DTOs, return responses
 - **Services** — business logic, status transition validation
 - **Constants** — domain constants (e.g. `VALID_TRANSITIONS`) live in `constants/`, not inside service files
-- **Schemas** — Mongoose schema/model definitions
-- **DTOs** — request/response shapes with class-validator + swagger decorators
+- **Schemas** — Mongoose schema + `TruckDocument` type (`HydratedDocument<T>`); source of truth for document shape
+- **Models** — `TruckModel` type alias + `truckModelProvider` custom provider; registered in module `providers[]`
+- **DTOs** — request/response shapes with class-validator + swagger decorators; exported via `dto/index.ts` barrel
 - **Guards** — global `JwtAuthGuard` validates Bearer token
 - **Filters/Pipes** — global `HttpExceptionFilter`, global `ValidationPipe`
 - **Seeds** — `SeederService` runs on `onModuleInit`, inserts 100 trucks if collection is empty
 
 **Auth assumption:** JWT tokens are issued by an external auth service. This module only verifies the signature using `JWT_SECRET` from `.env`.
+
+### Custom Model Provider Pattern
+
+Instead of `MongooseModule.forFeature()` + `@InjectModel()`, this project uses a custom provider factory:
+
+```ts
+// src/common/utils/create-model-provider.ts
+export function createModelProvider<TDocument>(cls: { name: string }, schema: Schema) {
+  return {
+    provide: `${cls.name}Model`,        // e.g. 'TruckModel'
+    useFactory: (connection: Connection) => connection.model<TDocument>(cls.name, schema),
+    inject: [getConnectionToken()],
+  };
+}
+```
+
+**Each module defines its model in `models/<entity>.model.ts`:**
+```ts
+export type TruckModel = Model<TruckDocument>;
+export const truckModelProvider = createModelProvider<TruckDocument>(Truck, TruckSchema);
+```
+
+**Module registers the provider directly (no `MongooseModule.forFeature`):**
+```ts
+providers: [truckModelProvider, TrucksService, TruckSeederService]
+```
+
+**Services inject via string token:**
+```ts
+@Inject('TruckModel') private readonly truckModel: TruckModel
+```
+
+**Why this pattern:**
+- **Inversion of control** — service depends on token `'TruckModel'`, not on Mongoose-specific `@InjectModel`
+- **Easier testing** — mock with `{ provide: 'TruckModel', useValue: mockModel }`, no Mongoose setup needed
+- **Framework isolation** — swapping Mongoose for another ODM only touches `model.ts`, not the service
+- **DRY** — `createModelProvider` eliminates boilerplate for every future module (Customer, Employee, etc.)
+- **Auto-token** — token `'TruckModel'` is derived from `Truck.name` automatically; no magic strings to maintain
+
+**Rule:** `TruckDocument` stays in `schemas/` (it describes the Mongoose document shape). `TruckModel` type and provider live in `models/`.
 
 ### Frontend
 - JWT token set once in `client/.env` as `VITE_JWT_TOKEN` — picked up by axios at build time
@@ -175,11 +221,12 @@ npm run test:cov      # with coverage
 
 ### Code conventions
 - Use `async/await`, never raw callbacks
-- DTOs must use `class-validator` + `@ApiProperty` decorators
+- DTOs must use `class-validator` + `@ApiProperty` decorators; always export via `dto/index.ts` barrel
 - Services throw NestJS `HttpException` subclasses (`NotFoundException`, `ConflictException`, `UnprocessableEntityException`)
 - No business logic in controllers
 - Domain constants (transition maps, enums data) go in `constants/`, not inlined in service files
 - All routes protected by `JwtAuthGuard` globally
+- Never use `MongooseModule.forFeature()` or `@InjectModel()` — use `createModelProvider` + `@Inject('XxxModel')` pattern (see Custom Model Provider Pattern above)
 
 ## API Reference
 

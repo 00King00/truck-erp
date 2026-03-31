@@ -1,23 +1,19 @@
 import {
   ConflictException,
+  Inject,
   Injectable,
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Truck, TruckDocument } from './schemas/truck.schema';
+import { TruckDocument } from './schemas/truck.schema';
+import { TruckModel } from './models/truck.model';
 import { TruckStatus } from './enums/truck-status.enum';
-import { CreateTruckDto } from './dto/create-truck.dto';
-import { UpdateTruckDto } from './dto/update-truck.dto';
-import { QueryTruckDto } from './dto/query-truck.dto';
+import { CreateTruckDto, UpdateTruckDto, QueryTruckDto } from './dto';
 import { VALID_TRANSITIONS } from './constants/truck-status-transitions';
 
 @Injectable()
 export class TrucksService {
-  constructor(
-    @InjectModel(Truck.name) private readonly truckModel: Model<TruckDocument>,
-  ) {}
+  constructor(@Inject('TruckModel') private readonly truckModel: TruckModel) {}
 
   async create(dto: CreateTruckDto): Promise<TruckDocument> {
     try {
