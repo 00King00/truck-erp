@@ -8,8 +8,14 @@ import {
 import { TruckDocument } from './schemas/truck.schema';
 import { TruckModel } from './models/truck.model';
 import { TruckStatus } from './enums/truck-status.enum';
-import { CreateTruckDto, UpdateTruckDto, QueryTruckDto } from './dto';
+import {
+  CreateTruckDto,
+  UpdateTruckDto,
+  QueryTruckDto,
+  ALLOWED_SORT_FIELDS,
+} from './dto';
 import { VALID_TRANSITIONS } from './constants/truck-status-transitions';
+import { escapeRegex } from '../../common/utils/escape-regex';
 
 @Injectable()
 export class TrucksService {
@@ -51,16 +57,20 @@ export class TrucksService {
 
     const filter: Record<string, unknown> = {};
 
-    if (code) filter.code = { $regex: code, $options: 'i' };
-    if (name) filter.name = { $regex: name, $options: 'i' };
+    if (code) filter.code = { $regex: `^${escapeRegex(code)}`, $options: 'i' };
+    if (name) filter.name = { $regex: escapeRegex(name), $options: 'i' };
     if (description)
-      filter.description = { $regex: description, $options: 'i' };
+      filter.description = { $regex: escapeRegex(description), $options: 'i' };
     if (status) filter.status = status;
+
+    const safeSortBy = ALLOWED_SORT_FIELDS.includes(sortBy as never)
+      ? sortBy
+      : 'createdAt';
 
     const [data, total] = await Promise.all([
       this.truckModel
         .find(filter)
-        .sort({ [sortBy]: sortOrder === 'asc' ? 1 : -1 })
+        .sort({ [safeSortBy]: sortOrder === 'asc' ? 1 : -1 })
         .skip((page - 1) * limit)
         .limit(limit)
         .exec(),

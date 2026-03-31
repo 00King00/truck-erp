@@ -10,6 +10,14 @@ import { Type } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { TruckStatus } from '../enums/truck-status.enum';
 
+export const ALLOWED_SORT_FIELDS = [
+  'code',
+  'name',
+  'status',
+  'createdAt',
+  'updatedAt',
+] as const;
+
 export class QueryTruckDto {
   @ApiPropertyOptional({ example: 'TRK', description: 'Partial match on code' })
   @IsString()
@@ -38,10 +46,11 @@ export class QueryTruckDto {
   description?: string;
 
   @ApiPropertyOptional({
+    enum: ALLOWED_SORT_FIELDS,
     example: 'createdAt',
     description: 'Field to sort by',
   })
-  @IsString()
+  @IsIn(ALLOWED_SORT_FIELDS)
   @IsOptional()
   sortBy?: string;
 

@@ -230,6 +230,10 @@ Check off steps as you complete them (`[ ]` → `[x]`). Each milestone is indepe
 - [x] Create `src/modules/trucks/dto/index.ts` — barrel export for all DTOs; updated imports in service and controller to use `from './dto'`
 - [x] Update `trucks.module.spec.ts` — replace `getModelToken(Truck.name)` override with `{ provide: 'TruckModel', useValue: mockModel }`; removed full module import to avoid real Mongoose connection in tests
 - [x] Verify all 51 tests pass (`npm run test`)
+- [x] Create `src/common/utils/escape-regex.ts` — sanitizes user input before use in MongoDB `$regex` to prevent ReDoS attacks
+- [x] Apply `escapeRegex` to all `$regex` filters in `findAll` (`code`, `name`, `description`)
+- [x] Change `code` filter from contains to prefix match (`^`) — `code` is a unique short identifier, prefix search is the correct UX
+- [x] Add `ALLOWED_SORT_FIELDS` whitelist to `QueryTruckDto` via `@IsIn` — rejects arbitrary `sortBy` values at validation layer; add defensive fallback in service
 
 **Milestone complete when:** All tests pass, no `@InjectModel` or `MongooseModule.forFeature` remain in the trucks module.
 
