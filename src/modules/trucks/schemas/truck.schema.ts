@@ -12,7 +12,7 @@ export class Truck {
   @Prop({ required: true })
   name: string;
 
-  @Prop({ required: true, enum: TruckStatus, index: true })
+  @Prop({ type: String, required: true, enum: TruckStatus, index: true })
   status: TruckStatus;
 
   @Prop()
